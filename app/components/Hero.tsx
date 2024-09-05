@@ -307,7 +307,7 @@ function Hero() {
                   <textarea
                     id="hs-about-hire-us-1"
                     name="hs-about-hire-us-1"
-                    rows="4"
+                    // rows="4"
                     className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
                   ></textarea>
                 </div>
