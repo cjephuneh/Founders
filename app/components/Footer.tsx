@@ -16,7 +16,7 @@ function Footer() {
 
         <div className="mt-3">
           <p className="text-gray-500">
-            We're part of the{" "}
+            Were part of the{" "}
             <a
               className="text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium"
               href="https://www.bricklabsai.com/"
