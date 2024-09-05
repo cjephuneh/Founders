@@ -26,7 +26,7 @@ function Footer() {
             family.
           </p>
           <p className="text-gray-500">
-            © Preline. 2022 Htmlstream. All rights reserved.
+            © Bricklabs 2024. All rights reserved.
           </p>
         </div>
 
