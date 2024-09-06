@@ -2,10 +2,10 @@ import React from "react";
 
 function Hero() {
   return (
-    <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto bg-white">
-      <div className="grid md:grid-cols-2 items-center gap-12 px-10">
+    <div className="max-w-[85rem] px-4 sm:px-2 lg:px-8 lg:py-14 mx-auto bg-white">
+      <div className="grid md:grid-cols-2 items-center gap-6 sm:gap-8 md:gap-12 px-4 sm:px-6 md:px-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 sm:text-4xl lg:text-5xl lg:leading-tight">
+          <h1 className="text-3xl font-bold text-gray-800 sm:text-4xl sm:mt-4 lg:text-5xl lg:leading-tight">
             Join Our Christian Founders & Enterpreneurs Community
           </h1>
           <p className="mt-1 md:text-lg text-gray-800">
