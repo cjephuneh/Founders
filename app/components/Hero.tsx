@@ -1,8 +1,52 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import axios from "axios";
+import { toast, Toaster } from 'react-hot-toast'; // Import react-hot-toast
+import dotenv from 'dotenv'; // Import dotenv
+dotenv.config(); // Load .env file
+
+const STRAPI_BASE_URL = process.env.STRAPI_BASE_URL; // Use process.env to access variables
+const AUTH_TOKEN = process.env.AUTH_TOKEN; // Use process.env to access variables
 
 function Hero() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    website: "",
+    details: "",
+  });
+  const [agreeToTerms, setAgreeToTerms] = useState(false); // State for terms agreement
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agreeToTerms) {
+      toast.error("You must agree to the terms."); // Notify if terms not agreed
+      return;
+    }
+    try {
+      const response = await axios.post(STRAPI_BASE_URL || '', { // Provide a default empty string
+        data: formData,
+      }, {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
+      });
+      toast.success("Founder created successfully!"); // Success notification
+      console.log("Founder created:", response.data);
+    } catch (error: any) { // Assert error type to any
+      toast.error("Error creating founder: " + error.message); // Error notification
+      console.error("Error creating founder:", error);
+    }
+  };
+
   return (
-    <div className="max-w-[85rem] px-4 sm:px-2 lg:px-8 lg:py-14 mx-auto bg-white">
+    <div className="max-w-[85rem] px-4 mt-10 sm:px-2 lg:px-8 lg:py-14 mx-auto bg-white shadow-lg rounded-lg"> {/* Added shadow and rounded corners */}
       <div className="grid md:grid-cols-2 items-center gap-6 sm:gap-8 md:gap-12 px-4 sm:px-6 md:px-10">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 sm:text-4xl sm:mt-4 lg:text-5xl lg:leading-tight">
@@ -164,11 +208,10 @@ function Hero() {
                   fill="currentColor"
                   className="fill-gray-500"
                 />
-                <path
-                  d="M130.739 19.9373L123.553 27.1229V40.3963H123.353C122.954 39.8973 122.555 39.3983 121.956 38.8993C121.357 38.4003 120.659 37.9013 119.86 37.5021C119.062 37.1029 118.164 36.7037 117.066 36.4043C116.367 36.2047 115.469 36.1049 114.571 36.0051L99.501 51.2746C99.501 53.3704 99.8004 55.3664 100.499 57.2626C101.098 59.1588 102.096 60.7556 103.393 62.1528C104.691 63.55 106.188 64.6478 107.884 65.3464C109.681 66.1448 111.677 66.544 113.872 66.544C115.968 66.544 117.864 66.1448 119.661 65.3464C121.457 64.548 122.854 63.2506 123.852 61.4542H123.952V65.8454H130.838V19.9373H130.739ZM123.253 54.4682C122.854 55.566 122.255 56.4642 121.557 57.2626C120.858 58.061 119.86 58.7596 118.862 59.1588C117.764 59.6578 116.667 59.8574 115.269 59.8574C113.972 59.8574 112.774 59.6578 111.677 59.1588C110.579 58.6598 109.681 58.061 108.982 57.2626C108.283 56.4642 107.685 55.566 107.285 54.4682C106.886 53.3704 106.687 52.3724 106.687 51.1748C106.687 50.077 106.886 48.9792 107.285 47.8814C107.685 46.7836 108.283 45.8854 108.982 45.087C109.681 44.2886 110.579 43.5899 111.677 43.1907C112.774 42.6917 113.872 42.4921 115.269 42.4921C116.567 42.4921 117.764 42.6917 118.862 43.1907C119.96 43.6897 120.858 44.2886 121.557 45.087C122.255 45.8854 122.854 46.7836 123.253 47.8814C123.653 48.9792 123.852 50.077 123.852 51.1748C123.852 52.3724 123.653 53.4702 123.253 54.4682Z"
-                  fill="currentColor"
+                {/* <path
+                  d="M130.739 19.9373L123.553 27.1229V40.3963H123.353C122.954 39.8973 122.555 39.3983 121.956 38.8993C121.357 38.4003 120.659 37.9013 119.86 37.5021C119.062 37.1029 118.164 36.7037 117.066 36.4043C116.367 36.2047 115.469 36.1049 114.571 36.0051L99.501 51.2746C99.501 53.3704 99.8004 55.3664 100.499 57.2626C101.098 59.1588 102.096 60.7556 103.393 62.1528C104.691 63.55 106.188 64.6478 107.884 65.3464C109.681 66.1448 111.677 66.544 113.872 66.544C115.968 66.544 117.864 66.1448 119.661 65.3464C121.457 64.548 122.854 63.2506 123.852 61.4542H123.952V65.8454H130.838V19.9373H130.739ZM123.253 54.4682C122.854 55.566 122.255 56.4642 121.557 57.2626C120.858 58.061 119.86 58.7596 118.862 59.1588C117.764 59.6578 116.667 59.8574 115.269 59.8574C113.972 59.8574 112.774 59.6578 111.677 59.1588C110.579 58.6598 109.681 58.061 108.982 57.2626C108.283 56.4642 107.685 55.566 107.285 54.4682C106.886 53.3704 106.687 52.3724 106.687 51.1748C106.687 50.077 106.886 48.9792 107.285 47.8814C107.685 46.7836 108.283 45.8854 108.982 45.087C109.681 44.2886 110.579 43.5899 111.677 43.1907C112.774 42.6917 113.872 42.4921 115.269 42.4921C116.567 42.4921 117.764 42.6917 118.862 43.1907C119.96 43.6897 120.858 44.2886 121.557 45.087C122.255 45.8854 122.854 46.7836 123.253 47.8814C123.653 48.9792 123.852 50.077 123.852 51.1748C123.852                   fill="currentColor"
                   className="fill-gray-500"
-                />
+                /> */}
                 <path
                   d="M162.275 44.9872C161.477 43.091 160.279 41.4941 158.882 40.1967C157.485 38.8993 155.788 37.8015 153.892 37.1029C151.996 36.4043 149.9 36.0051 147.704 36.0051C145.509 36.0051 143.513 36.4043 141.517 37.1029C139.621 37.8015 137.924 38.8993 136.527 40.1967C135.13 41.4941 134.032 43.091 133.134 44.9872C132.335 46.8834 131.936 48.9792 131.936 51.2746C131.936 53.57 132.335 55.6658 133.134 57.562C133.932 59.4582 135.13 61.055 136.527 62.3524C137.924 63.6498 139.621 64.7476 141.517 65.4462C143.413 66.1448 145.509 66.544 147.704 66.544C149.9 66.544 151.896 66.1448 153.892 65.4462C155.788 64.7476 157.485 63.6498 158.882 62.3524C160.279 61.055 161.377 59.4582 162.275 57.562C163.074 55.6658 163.473 53.57 163.473 51.2746C163.573 48.9792 163.174 46.8834 162.275 44.9872ZM155.689 54.4682C155.289 55.566 154.691 56.4642 153.992 57.2626C153.293 58.061 152.395 58.7596 151.297 59.1588C150.2 59.6578 149.102 59.8574 147.704 59.8574C146.407 59.8574 145.209 59.6578 144.112 59.1588C143.014 58.6598 142.116 58.061 141.417 57.2626C140.718 56.4642 140.12 55.566 139.72 54.4682C139.321 53.3704 139.122 52.3724 139.122 51.1748C139.122 50.077 139.321 48.9792 139.72 47.8814C140.12 46.7836 140.619 45.8854 141.417 45.087C142.116 44.2886 143.014 43.59 144.112 43.1908C145.209 42.6918 146.307 42.4922 147.704 42.4922C149.002 42.4922 150.2 42.6918 151.297 43.1908C152.395 43.6898 153.293 44.2886 153.992 45.087C154.691 45.8854 155.289 46.7836 155.689 47.8814C156.088 48.9792 156.287 50.077 156.287 51.1748C156.287 52.3724 156.088 53.4702 155.689 54.4682Z"
                   fill="currentColor"
@@ -229,12 +272,12 @@ function Hero() {
         </div>
 
         <div className="relative">
-          <div className="flex flex-col border rounded-xl p-4 sm:p-6 lg:p-10">
+          <div className="flex flex-col border rounded-xl p-4 sm:p-6 lg:p-10 bg-gray-50"> {/* Added background color */}
             <h2 className="text-xl font-semibold text-gray-800">
               Fill in the form
             </h2>
 
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mt-6 grid gap-4 lg:gap-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                   <div>
@@ -243,9 +286,10 @@ function Hero() {
                     </label>
                     <input
                       type="text"
-                      name="hs-firstname-hire-us-1"
-                      id="hs-firstname-hire-us-1"
-                      className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm  border"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="py-3 px-4 block w-full text-black border-gray-200 rounded-lg text-sm  border"
                     />
                   </div>
 
@@ -255,9 +299,10 @@ function Hero() {
                     </label>
                     <input
                       type="text"
-                      name="hs-lastname-hire-us-1"
-                      id="hs-lastname-hire-us-1"
-                      className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="py-3 px-4 block w-full text-black border-gray-200 rounded-lg text-sm border"
                     />
                   </div>
                 </div>
@@ -268,64 +313,51 @@ function Hero() {
                   </label>
                   <input
                     type="email"
-                    name="hs-work-email-hire-us-1"
-                    id="hs-work-email-hire-us-1"
-                    className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="py-3 px-4 block w-full text-black border-gray-200 rounded-lg text-sm border"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                  <div>
-                    <label className="block mb-2 text-sm text-gray-700 font-medium">
-                      Company
-                    </label>
-                    <input
-                      type="text"
-                      name="hs-company-hire-us-1"
-                      id="hs-company-hire-us-1"
-                      className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
-                    />
-                  </div>
-
+                <div className="">
                   <div>
                     <label className="block mb-2 text-sm text-gray-700 font-medium">
                       Company Website
                     </label>
                     <input
                       type="text"
-                      name="hs-company-website-hire-us-1"
-                      id="hs-company-website-hire-us-1"
-                      className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
+                      name="website"
+                      value={formData.website}
+                      onChange={handleChange}
+                      className="py-3 px-4 block w-full text-black border-gray-200 rounded-lg text-sm border"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block mb-2 text-sm text-gray-700 font-medium">
-                    Details
-                  </label>
-                  <textarea
-                    id="hs-about-hire-us-1"
-                    name="hs-about-hire-us-1"
-                    // rows="4"
-                    className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border"
-                  ></textarea>
+                  <div>
+                    <label className="block mb-2 text-sm text-black font-medium mt-3">
+                      Details (What your company does)
+                    </label>
+                    <textarea
+                      name="details"
+                      value={formData.details}
+                      onChange={handleChange}
+                      className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm border text-black"
+                    ></textarea>
+                  </div>
                 </div>
               </div>
-            </form>
 
-            <div className="mt-3 flex">
-              <div className="flex">
+              <div className="mt-3 flex items-center">
                 <input
-                  id="remember-me"
-                  name="remember-me"
+                  id="agree-to-terms"
+                  name="agree-to-terms"
                   type="checkbox"
+                  onChange={() => setAgreeToTerms(!agreeToTerms)} // Toggle terms agreement
                   className="shrink-0 mt-1.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500"
                 />
-              </div>
-              <div className="ms-3">
-                <label className="text-sm text-gray-600">
-                  By submitting this form I have read and acknowledged the{" "}
+                <label className="text-sm text-gray-600 ms-3">
+                  I agree to the{" "}
                   <a
                     className="text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium"
                     href="#"
@@ -334,25 +366,26 @@ function Hero() {
                   </a>
                 </label>
               </div>
-            </div>
 
-            <div className="mt-6 grid">
-              <button
-                type="submit"
-                className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                Send inquiry
-              </button>
-            </div>
+              <div className="mt-6 grid">
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  Send inquiry
+                </button>
+              </div>
 
-            <div className="mt-3 text-center">
-              <p className="text-sm text-gray-500">
-                Well get back to you in 1-2 business days.
-              </p>
-            </div>
+              <div className="mt-3 text-center">
+                <p className="text-sm text-gray-500">
+                  We'll get back to you in 1-2 business days.
+                </p>
+              </div>
+            </form>
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
